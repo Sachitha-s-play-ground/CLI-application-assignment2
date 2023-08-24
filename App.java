@@ -133,15 +133,22 @@ public class App {
                         String accountNumber = scanner.nextLine();
 
                         if (accountNumberValidation(accountNumber, details)) {
-                            System.out.printf("Current Balance: %f\n", findBalance(accountNumber, details));
+                            System.out.printf("Current Balance: %f\n",
+                                    Double.valueOf(details[find(accountNumber, details)][2]));
                             System.out.print("Deposite Amount: ");
                             double deposite = scanner.nextDouble();
                             scanner.nextLine();
 
                             if (deposite > 500) {
                                 details = updateBalance(accountNumber, deposite, details);
-                                System.out.printf("New Balance: %f\n", findBalance(accountNumber, details));
+                                String message = String.format(SUCCESS_MESSAGE, "Successfully deposited");
+                                System.out.println(message);
+                                System.out.printf("New Balance: %f\n",
+                                        Double.valueOf(details[find(accountNumber, details)][2]));
                             } else {
+                                String messsage = String.format(ERROR_MESSAGE,
+                                        "Deposites that lower than 500 is not allowed");
+                                System.out.println(messsage);
                                 System.out.print("Do you want to do another deposite(Y/N): ");
                                 if (scanner.nextLine().strip().toUpperCase().equals("Y"))
                                     continue;
@@ -168,6 +175,229 @@ public class App {
                                 break lbl_main;
                             }
                         }
+                    } while (true);
+
+                case WithDraw:
+                    withdrawLable: do {
+                        System.out.print("Enter account number: ");
+                        String accountNumber = scanner.nextLine();
+
+                        do {
+                            if (accountNumberValidation(accountNumber, details)) {
+                                double currentBalance = Double.valueOf(details[find(accountNumber, details)][2]);
+
+                                if (currentBalance < 600) {
+                                    String message = String.format(ERROR_MESSAGE, "Insufficient account balance");
+                                    System.out.println(message);
+                                    System.out.print("Do you want to try again(Y/N): ");
+                                    if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                        continue withdrawLable;
+                                    else {
+                                        screen = Dashboard;
+                                        break lbl_main;
+                                    }
+
+                                }
+
+                                System.out.printf("Current Balnce: %f\n", currentBalance);
+                                System.out.print("Enter withdraw amount: ");
+                                double withDrawAmount = scanner.nextDouble();
+                                scanner.nextLine();
+
+                                if (withDrawAmount < 100) {
+                                    String message = String.format(ERROR_MESSAGE, "Minimum withdrawable amout is 100");
+                                    System.out.println(message);
+                                    continue;
+                                }
+
+                                if (currentBalance - withDrawAmount < 500) {
+                                    String message = String.format(ERROR_MESSAGE, "Insufficient account balance");
+                                    System.out.println(message);
+                                    continue;
+                                }
+
+                                updateBalance(accountNumber, -withDrawAmount, details);
+
+                                String message = String.format(SUCCESS_MESSAGE, "Successfully withdrawed");
+                                System.out.println(message);
+
+                                System.out.printf("New Balance: %f\n",
+                                        Double.valueOf(details[find(accountNumber, details)][2]));
+
+                                System.out.print("Do you want to withdraw again(Y/N): ");
+                                if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                    continue;
+                                else {
+                                    screen = Dashboard;
+                                    break lbl_main;
+                                }
+
+                            } else {
+                                System.out.print("Do you want to try again(Y/N): ");
+                                if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                    continue withdrawLable;
+                                else {
+                                    screen = Dashboard;
+                                    break lbl_main;
+                                }
+                            }
+
+                        } while (true);
+
+                    } while (true);
+                case Transfer_Money:
+                    do {
+                        System.out.print("Enter from account number: ");
+                        String fromaccountNumber = scanner.nextLine();
+                        if (!accountNumberValidation(fromaccountNumber, details)) {
+                            System.out.print("Do you want to try again(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                continue;
+                            else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+                        }
+
+                        System.out.print("Enter to account number: ");
+                        String toaccountNumber = scanner.nextLine();
+                        if (!accountNumberValidation(toaccountNumber, details)) {
+                            System.out.print("Do you want to try again(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                continue;
+                            else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+                        }
+
+                        double fromAccountBalnce = Double.valueOf(details[find(fromaccountNumber, details)][2]);
+                        double toAccountBalnce = Double.valueOf(details[find(toaccountNumber, details)][2]);
+
+                        System.out.printf("From account Balance: %f\n",
+                                fromAccountBalnce);
+                        System.out.printf("To account Balance: %f\n",
+                                toAccountBalnce);
+
+                        System.out.print("Enter transefer amount: ");
+                        double transeferAmount = scanner.nextDouble();
+                        scanner.nextLine();
+
+                        if (transeferAmount < 100) {
+                            String message = String.format(ERROR_MESSAGE, "Minimum withdrawable amout is 100");
+                            System.out.println(message);
+                            System.out.print("Do you want to try again(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                continue;
+                            else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+                        }
+
+                        if (fromAccountBalnce - transeferAmount < 500) {
+                            String message = String.format(ERROR_MESSAGE, "Insufficient account balance");
+                            System.out.println(message);
+                            System.out.print("Do you want to try again(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                continue;
+                            else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+                        }
+
+                        updateBalance(fromaccountNumber, -transeferAmount, details);
+                        updateBalance(toaccountNumber, transeferAmount, details);
+
+                        String message = String.format(SUCCESS_MESSAGE, "Successfully transefered");
+                        System.out.println(message);
+
+                        System.out.printf("New from account Balance: %f\n",
+                                Double.valueOf(details[find(fromaccountNumber, details)][2]));
+
+                        System.out.printf("New to account Balance: %f\n",
+                                Double.valueOf(details[find(toaccountNumber, details)][2]));
+
+                        System.out.print("Do you want to transefer again(Y/N): ");
+                        if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                            continue;
+                        else {
+                            screen = Dashboard;
+                            break lbl_main;
+                        }
+
+                    } while (true);
+
+                case Acc_Bal:
+                    do {
+                        System.out.print("Enter account number: ");
+                        String accountNumber = scanner.nextLine();
+                        if (accountNumberValidation(accountNumber, details)) {
+                            double accountBalnce = Double.valueOf(details[find(accountNumber, details)][2]);
+                            String accountName = details[find(accountNumber, details)][1];
+                            System.out.println("Name: ".concat(accountName));
+                            System.out.printf("current account Balance: %f\n",
+                                    accountBalnce);
+                            System.out.printf("withdrawable account Balance: %f\n",
+                                    accountBalnce - 500);
+                            System.out.print("Do you want to check again(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                continue;
+                            else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+                        } else {
+                            System.out.print("Do you want to try again(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                continue;
+                            else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+                        }
+
+                    } while (true);
+                case Del_Acc:
+                    do {
+                        System.out.print("Enter account number: ");
+                        String accountNumber = scanner.nextLine();
+                        if (accountNumberValidation(accountNumber, details)) {
+                            double accountBalnce = Double.valueOf(details[find(accountNumber, details)][2]);
+                            String accountName = details[find(accountNumber, details)][1];
+                            System.out.println("Name: ".concat(accountName));
+                            System.out.printf("current account Balance: %f\n",
+                                    accountBalnce);
+
+                            System.out.print("Are you sure to delete(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y")) {
+                                details = deteteAccount(accountNumber, details);
+                                String message = String.format(SUCCESS_MESSAGE, "Successfully deleted");
+                                System.out.println(message);
+                                System.out.print("Do you want to delete account again(Y/N): ");
+                                if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                    continue;
+                                else {
+                                    screen = Dashboard;
+                                    break lbl_main;
+                                }
+
+                            } else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+
+                        } else {
+                            System.out.print("Do you want to try again(Y/N): ");
+                            if (scanner.nextLine().strip().toUpperCase().equals("Y"))
+                                continue;
+                            else {
+                                screen = Dashboard;
+                                break lbl_main;
+                            }
+                        }
+
                     } while (true);
 
             }
@@ -267,12 +497,25 @@ public class App {
         return null;
     }
 
-    public static double findBalance(String accountNumber, String[][] details) {
+    public static int find(String accountNumber, String[][] details) {
         for (int i = 0; i < details.length; i++) {
             if (accountNumber.equals(details[i][0])) {
-                return Double.valueOf(details[i][2]);
+                return i;
             }
         }
         return -1;
+    }
+
+    public static String[][] deteteAccount(String accountNumber, String[][] details) {
+        int deleteIndex = find(accountNumber, details);
+        String[][] newDetails = new String[details.length - 1][3];
+        int k = 0;
+        for (int i = 0; i < details.length; i++) {
+            if (i == deleteIndex)
+                continue;
+            newDetails[k++] = details[i];
+        }
+
+        return newDetails;
     }
 }
